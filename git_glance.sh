@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cargo run
+$PATH-TO-YOUR-APP # example ~/dev/git_glance/target/release/git_glance
 
 if [[ -f dir_path.txt && -s dir_path.txt ]]; then
     dir_path=$(cat dir_path.txt)
@@ -11,3 +11,5 @@ if [[ -f dir_path.txt && -s dir_path.txt ]]; then
         echo "Directory not found"
     }
 fi
+
+clear
