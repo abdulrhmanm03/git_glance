@@ -29,7 +29,6 @@ fn main() -> io::Result<()> {
     result
 }
 
-#[allow(dead_code)]
 #[derive(Clone)]
 struct GitRepo {
     name: String,
@@ -117,6 +116,10 @@ impl App {
             let threshold = 1;
             self.searched_repos = fuzzy_finder(&self.search_query, &self.all_repos, threshold)
         }
+        self.reset_index()
+    }
+
+    fn reset_index(&mut self) {
         self.selected_repo_index = 0;
     }
 
@@ -136,12 +139,22 @@ impl App {
         let _ = self.searched_repos[self.selected_repo_index].go_to_dir();
     }
 
+    fn enter_edit_mode(&mut self) {
+        self.mode = Modes::Edit
+    }
+
+    fn enter_normal_mode(&mut self) {
+        self.mode = Modes::Normal
+    }
+
     fn events_handler(&mut self) -> std::io::Result<bool> {
         if let Event::Key(key) = event::read()? {
             match self.mode {
                 Modes::Normal => match key.code {
-                    KeyCode::Char('i') => self.mode = Modes::Edit,
+                    KeyCode::Char('i') => self.enter_edit_mode(),
                     KeyCode::Char('q') => self.exit(),
+                    KeyCode::Char('k') => self.prev_repo(),
+                    KeyCode::Char('j') => self.next_repo(),
                     _ => {}
                 },
 
@@ -154,7 +167,7 @@ impl App {
                         self.delete_char_from_search_query();
                         self.search(fuzzy_finder)
                     }
-                    KeyCode::Esc => self.mode = Modes::Normal,
+                    KeyCode::Esc => self.enter_normal_mode(),
                     _ => {}
                 },
             }
